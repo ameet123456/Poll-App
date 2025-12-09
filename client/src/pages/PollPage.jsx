@@ -13,7 +13,7 @@ export default function PollPage() {
   // ✅ Load poll on page open (REST)
   useEffect(() => {
     const loadPoll = async () => {
-      const res = await fetch(`http://localhost:3000/api/poll/${pollId}`);
+      const res = await fetch(`https://poll-backend-idy1.onrender.com/api/poll/${pollId}`);
       const data = await res.json();
       setPoll(data);
       setLoading(false);
