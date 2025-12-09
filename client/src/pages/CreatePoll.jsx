@@ -53,7 +53,7 @@ export default function CreatePoll() {
       return;
     }
 
-    const res = await fetch("http://localhost:3000/api/create", {
+    const res = await fetch("https://poll-backend-idy1.onrender.com/api/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
