@@ -11,7 +11,9 @@ export default function AdminDashboard() {
   // Load poll as admin
   useEffect(() => {
     const loadAdminPoll = async () => {
-      const res = await fetch(`http://localhost:3000/api/admin/${adminId}`);
+      const res = await fetch(
+  `https://poll-backend-idy1.onrender.com/api/admin/${adminId}`
+);
       const data = await res.json();
       setPoll(data);
     };
@@ -34,12 +36,12 @@ export default function AdminDashboard() {
     socket.emit("stopPoll", adminId);
   };
 
-  const handleCopyVoterLink = () => {
-    const voterLink = `http://localhost:5173/poll/${poll.pollId}`;
-    navigator.clipboard.writeText(voterLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+const handleCopyVoterLink = () => {
+  const voterLink = `https://poll-app-amber.vercel.app/poll/${poll.pollId}`;
+  navigator.clipboard.writeText(voterLink);
+  setCopied(true);
+  setTimeout(() => setCopied(false), 2000);
+};
 
   if (!poll) {
     return (
