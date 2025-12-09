@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3000", {
-  transports: ["websocket"],  
+const socket = io("https://poll-backend-idy1.onrender.com", {
+  transports: ["websocket"],
   withCredentials: false,
 });
 

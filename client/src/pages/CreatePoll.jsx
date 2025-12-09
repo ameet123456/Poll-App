@@ -98,11 +98,16 @@ export default function CreatePoll() {
               <input
                 type="text"
                 readOnly
-                value={`http://localhost:5173/poll/${links.pollId}`}
+                value={`https://poll-app-amber.vercel.app/poll/${links.pollId}`}
                 className="flex-1 bg-white border border-blue-200 rounded-lg px-4 py-2 text-sm text-gray-700 focus:outline-none"
               />
               <button
-                onClick={() => copyToClipboard(`http://localhost:5173/poll/${links.pollId}`, "voter")}
+                onClick={() =>
+  copyToClipboard(
+    `https://poll-app-amber.vercel.app/poll/${links.pollId}`,
+    "voter"
+  )
+}
                 className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors"
               >
                 {copiedVoter ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
@@ -121,11 +126,16 @@ export default function CreatePoll() {
               <input
                 type="text"
                 readOnly
-                value={`http://localhost:5173/admin/${links.adminId}`}
+                value={`https://poll-app-amber.vercel.app/admin/${links.adminId}`}
                 className="flex-1 bg-white border border-purple-200 rounded-lg px-4 py-2 text-sm text-gray-700 focus:outline-none"
               />
               <button
-                onClick={() => copyToClipboard(`http://localhost:5173/admin/${links.adminId}`, "admin")}
+                onClick={() =>
+  copyToClipboard(
+    `https://poll-app-amber.vercel.app/admin/${links.adminId}`,
+    "admin"
+  )
+}
                 className="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg transition-colors"
               >
                 {copiedAdmin ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
