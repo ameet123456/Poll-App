@@ -59,7 +59,7 @@ const handleCopyVoterLink = () => {
     (max, o) => (o.votes > max.votes ? o : max),
     poll.options[0]
   );
-  const voterLink = `http://localhost:5173/poll/${poll.pollId}`;
+const voterLink = `https://poll-app-amber.vercel.app/poll/${poll.pollId}`;
 
   return (
     <div className="min-h-screen bg-white p-6">

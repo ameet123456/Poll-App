@@ -1,7 +1,7 @@
-import express from 'express';
-import { createServer } from 'node:http';
-import cors from 'cors';
-import { Server } from 'socket.io';
+import express from "express";
+import { createServer } from "node:http";
+import cors from "cors";
+import { Server } from "socket.io";
 
 const app = express();
 app.use(cors());
@@ -15,9 +15,11 @@ const io = new Server(server, {
   }
 });
 
-// ✅ In-memory poll storage
-const polls = {};
+/* ✅✅✅ TRUE GLOBAL MEMORY (SURVIVES HOT RELOADS) */
+global.polls = global.polls || {};
+const polls = global.polls;
 
+/* ✅ CREATE POLL */
 app.post("/api/create", (req, res) => {
   const { question, options, showResults, endTime } = req.body;
 
@@ -42,16 +44,15 @@ app.post("/api/create", (req, res) => {
   res.json({ pollId, adminId });
 });
 
+/* ✅ GET POLL (VOTERS) */
 app.get("/api/poll/:pollId", (req, res) => {
   const { pollId } = req.params;
-
   const poll = polls[pollId];
 
   if (!poll) {
     return res.status(404).json({ error: "Poll not found" });
   }
 
-  // Important: DO NOT send adminId to voters
   res.json({
     pollId: poll.pollId,
     question: poll.question,
@@ -62,72 +63,60 @@ app.get("/api/poll/:pollId", (req, res) => {
   });
 });
 
+/* ✅ GET ADMIN POLL */
 app.get("/api/admin/:adminId", (req, res) => {
   const { adminId } = req.params;
 
-  const poll = Object.values(polls).find(
-    (p) => p.adminId === adminId
-  );
+  const poll = Object.values(polls).find(p => p.adminId === adminId);
 
   if (!poll) {
     return res.status(404).json({ error: "Poll not found" });
   }
 
   res.json({
-    pollId: poll.pollId,        // ✅ Needed to generate voter link
+    pollId: poll.pollId,
     adminId: poll.adminId,
     question: poll.question,
     options: poll.options,
     showResults: poll.showResults,
     endTime: poll.endTime,
     isStopped: poll.isStopped,
-    createdAt: poll.createdAt,
+    createdAt: poll.createdAt
   });
 });
 
-
-
-// Socket reserved for VOTE phase
+/* ✅ SOCKET.IO */
 io.on("connection", (socket) => {
-  console.log("a user connected:", socket.id);
+  console.log("User connected:", socket.id);
 
-  // ✅ VOTING (voters)
+  /* ✅ USER VOTE */
   socket.on("vote", ({ pollId, optionIndex }) => {
     const poll = polls[pollId];
-
     if (!poll || poll.isStopped) return;
 
     if (poll.options[optionIndex]) {
       poll.options[optionIndex].votes += 1;
     }
 
-    // broadcast updated poll to everyone
     io.emit("pollUpdate", poll);
   });
 
-  // ✅ ADMIN STOP POLL
+  /* ✅ ADMIN STOP */
   socket.on("stopPoll", (adminId) => {
-    const poll = Object.values(polls).find(
-      (p) => p.adminId === adminId
-    );
-
+    const poll = Object.values(polls).find(p => p.adminId === adminId);
     if (!poll) return;
 
     poll.isStopped = true;
-
-    // notify everyone that poll is stopped
     io.emit("pollStopped", poll.pollId);
   });
 
   socket.on("disconnect", () => {
-    console.log("user disconnected:", socket.id);
+    console.log("User disconnected:", socket.id);
   });
 });
 
-
-
+/* ✅ RENDER SAFE PORT */
 const PORT = process.env.PORT || 3000;
-
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
