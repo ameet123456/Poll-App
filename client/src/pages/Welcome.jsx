@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { Vote, Sparkles, ArrowRight, LineChart, Code2, Rocket } from "lucide-react";
+import {
+  Vote,
+  Sparkles,
+  ArrowRight,
+  LineChart,
+  Code2,
+  Rocket,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function WelcomePage() {
+  const navigate = useNavigate();
+
   const heroRef = useRef(null);
   const demoRef = useRef(null);
   const roadmapRef = useRef(null);
@@ -14,19 +24,31 @@ export default function WelcomePage() {
   const [learningVisible, setLearningVisible] = useState(false);
   const [stackVisible, setStackVisible] = useState(false);
 
-  // Small easter egg for devs opening DevTools
-  useEffect(() => {
-    const styleTitle =
-      "color: #000; background: #FFD54F; padding: 4px 8px; font-size: 14px; font-weight: bold;";
-    const styleText = "color: #555; font-size: 12px;";
+  // IMPORTANT: MODAL STATE
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
 
-    console.log("%cHello developer 👋", styleTitle);
-    console.log(
-      "%cThis is a Socket.IO learning project. Check the code, break things, learn things.",
-      styleText
+  const [demoVotes, setDemoVotes] = useState([
+    { label: "Custom Backgrounds", votes: 5 },
+    { label: "Theme Customization", votes: 3 },
+    { label: "Better Vote Protection", votes: 2 },
+    { label: "Poll Analytics Dashboard", votes: 4 },
+  ]);
+
+  const handleDemoVote = (index) => {
+    setDemoVotes((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, votes: item.votes + 1 } : item
+      )
     );
+  };
+
+  // DevTools Greeting
+  useEffect(() => {
+    console.log("%cHello Developer 👋", "color:black;background:#FFD54F;padding:4px 8px;font-weight:bold;");
+    console.log("%cWelcome to my Socket.IO learning project!", "color:#555;font-size:12px;");
   }, []);
 
+  // Intersection Animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -41,46 +63,35 @@ export default function WelcomePage() {
       { threshold: 0.15 }
     );
 
-    if (heroRef.current) observer.observe(heroRef.current);
-    if (demoRef.current) observer.observe(demoRef.current);
-    if (roadmapRef.current) observer.observe(roadmapRef.current);
-    if (learningRef.current) observer.observe(learningRef.current);
-    if (stackRef.current) observer.observe(stackRef.current);
+    [heroRef, demoRef, roadmapRef, learningRef, stackRef].forEach((ref) => {
+      if (ref.current) observer.observe(ref.current);
+    });
 
     return () => observer.disconnect();
   }, []);
 
   return (
     <div className="min-h-screen bg-white text-black overflow-x-hidden">
-      {/* Top nav / header */}
-      <header className="border-b border-black/10 sticky top-0 bg-white/95 backdrop-blur-sm z-50">
+
+      {/* HEADER */}
+      <header className="border-b border-black/10 sticky top-0 bg-white/95 backdrop-blur-sm z-30">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 border-2 border-black rounded-full flex items-center justify-center transform hover:rotate-12 transition-transform">
+            <div className="w-8 h-8 border-2 border-black rounded-full flex items-center justify-center">
               <Vote className="w-4 h-4" />
             </div>
             <div className="font-bold tracking-tight">Real-Time Poll App</div>
           </div>
+
           <nav className="flex items-center gap-4 text-sm">
-            <a
-              href="#roadmap"
-              className="hover:underline underline-offset-4 transition-all"
+            <a href="#roadmap" className="hover:underline">Roadmap</a>
+            <a href="#learning" className="hover:underline">What I Learned</a>
+            <a href="#stack" className="hover:underline">Tech Stack</a>
+
+            <button
+              onClick={() => navigate("/create")}
+              className="inline-flex items-center gap-1 border-2 border-black rounded-full px-3 py-1 text-xs font-semibold hover:bg-black hover:text-white"
             >
-              Roadmap
-            </a>
-            <a
-              href="#learning"
-              className="hover:underline underline-offset-4 transition-all"
-            >
-              What I Learned
-            </a>
-            <a
-              href="#stack"
-              className="hover:underline underline-offset-4 transition-all"
-            >
-              Tech Stack
-            </a>
-            <button className="inline-flex items-center gap-1 border-2 border-black rounded-full px-3 py-1 text-xs font-semibold hover:bg-black hover:text-white transition-all hover:scale-105">
               Create Poll
               <ArrowRight className="w-3 h-3" />
             </button>
@@ -88,8 +99,15 @@ export default function WelcomePage() {
         </div>
       </header>
 
+      {/* GLOBAL BLUR OVERLAY */}
+      {demoModalOpen && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"></div>
+      )}
+
+      {/* MAIN CONTENT */}
       <main className="max-w-5xl mx-auto px-4 py-10 space-y-12">
-        {/* Hero Section */}
+
+        {/* HERO SECTION */}
         <section className="grid gap-8 md:grid-cols-[1.2fr,1fr] items-center">
           <div
             ref={heroRef}
@@ -97,91 +115,63 @@ export default function WelcomePage() {
               heroVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
             }`}
           >
-            <div className="inline-flex items-center gap-2 border border-black rounded-full px-3 py-1 text-xs mb-4 animate-pulse">
+            <div className="inline-flex items-center gap-2 border border-black rounded-full px-3 py-1 text-xs mb-4">
               <Sparkles className="w-3 h-3" />
-              <span className="uppercase tracking-wide">
-                Socket.IO Learning Journey – V2
-              </span>
+              <span>Socket.IO Learning Journey – V2</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-black leading-tight mb-3">
+
+            <h1 className="text-3xl font-black mb-3">
               Real-Time Polls, Built to Learn How the Web Talks.
             </h1>
-            <p className="text-sm md:text-base text-gray-700 mb-6">
-              This app started as a simple "Tea vs Coffee?" test and grew into a
-              full real-time polling system using <span className="font-semibold">Socket.IO</span>,{" "}
-              <span className="font-semibold">React</span>, and{" "}
-              <span className="font-semibold">Node.js</span>.  
-              V2 focuses on sharable polls, admin view, and live result updates.
+
+            <p className="text-gray-700 mb-6 text-sm">
+              From a simple idea → to real-time WebSocket interactions →
+              to a sharable poll system.
             </p>
 
-            <div className="flex flex-wrap gap-3">
-              <button className="inline-flex items-center gap-2 border-2 border-black bg-black text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-900 transition-all hover:scale-105 hover:shadow-lg">
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate("/create")}
+                className="border-2 border-black bg-black text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-900"
+              >
                 Create a Poll
-                <ArrowRight className="w-4 h-4" />
               </button>
-              <button className="inline-flex items-center gap-2 border-2 border-black px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-all hover:scale-105">
+
+              <button
+                onClick={() => setDemoModalOpen(true)}
+                className="border-2 border-black px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-100"
+              >
                 View Demo Poll
               </button>
             </div>
-
-            <p className="mt-4 text-xs text-gray-600">
-              V3 (coming soon): background customization, theme options, better
-              vote protection, and more "real product" features.
-            </p>
           </div>
 
-          {/* Demo Poll Card (static) */}
+          {/* STATIC PREVIEW CARD */}
           <div
             ref={demoRef}
-            className={`border-2 border-black rounded-2xl p-5 shadow-[4px_4px_0px_#000] bg-gray-50 transition-all duration-1000 delay-200 hover:shadow-[6px_6px_0px_#000] hover:-translate-y-1 ${
+            className={`border-2 border-black rounded-2xl p-5 bg-gray-50 shadow-[4px_4px_0px_black] transition-all duration-1000 ${
               demoVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className="inline-flex items-center gap-2 text-xs font-semibold border border-black rounded-full px-3 py-1 bg-white">
-                <Vote className="w-3 h-3" />
-                LIVE DEMO
-              </div>
-              <span className="text-[11px] text-gray-600">Read-only preview</span>
-            </div>
-            <h2 className="text-sm font-bold mb-4">
-              Which feature should ship first in V3?
-            </h2>
+            <h2 className="text-sm font-bold mb-4">Which feature should ship first?</h2>
 
-            <div className="space-y-2 text-xs">
-              {[
-                { label: "Custom Backgrounds", percent: 46 },
-                { label: "Theme Customization", percent: 32 },
-                { label: "Better Vote Protection", percent: 15 },
-                { label: "Poll Analytics Dashboard", percent: 7 },
-              ].map((opt, idx) => (
-                <div
-                  key={opt.label}
-                  className="transform transition-all duration-500 hover:scale-102"
-                  style={{ transitionDelay: `${idx * 100}ms` }}
-                >
-                  <div className="flex justify-between mb-1">
-                    <span>{opt.label}</span>
-                    <span className="font-semibold">{opt.percent}%</span>
-                  </div>
-                  <div className="h-6 border border-black rounded-lg overflow-hidden bg-white">
-                    <div
-                      className="h-full bg-black transition-all duration-1000 ease-out"
-                      style={{ width: demoVisible ? `${opt.percent}%` : "0%" }}
-                    />
-                  </div>
+            {[46, 32, 15, 7].map((v, i) => (
+              <div key={i} className="mb-2">
+                <div className="flex justify-between text-xs">
+                  <span>Option {i + 1}</span>
+                  <span>{v}%</span>
                 </div>
-              ))}
-            </div>
-
-            <p className="mt-4 text-[11px] text-gray-600">
-              This is just a static preview – the real polls update live via Socket.IO.
-            </p>
+                <div className="h-6 border border-black rounded-lg bg-white overflow-hidden">
+                  <div
+                    className="h-full bg-black"
+                    style={{ width: demoVisible ? `${v}%` : "0%" }}
+                  ></div>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
-
-        {/* Roadmap Section */}
-        <section
+<section
           id="roadmap"
           ref={roadmapRef}
           className={`space-y-4 transition-all duration-1000 ${
@@ -294,9 +284,7 @@ export default function WelcomePage() {
             ))}
           </div>
         </section>
-
-        {/* Tech Stack */}
-        <section
+<section
           id="stack"
           ref={stackRef}
           className={`space-y-3 pb-10 transition-all duration-1000 delay-300 ${
@@ -328,6 +316,36 @@ export default function WelcomePage() {
             ))}
           </div>
         </section>
+        {/* MODAL FOR DEMO POLL */}
+        {demoModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="bg-white border-2 border-black rounded-2xl p-6 w-[90%] max-w-md shadow-[6px_6px_0px_black]">
+              <div className="flex justify-between mb-4">
+                <h2 className="font-bold flex items-center gap-2">
+                  <Vote className="w-4 h-4" /> Demo Poll
+                </h2>
+                <button onClick={() => setDemoModalOpen(false)}>✕</button>
+              </div>
+
+              {demoVotes.map((opt, idx) => {
+                const total = demoVotes.reduce((sum, o) => sum + o.votes, 0);
+                const percent = ((opt.votes / total) * 100).toFixed(1);
+
+                return (
+                  <div key={idx} onClick={() => handleDemoVote(idx)} className="cursor-pointer mb-3">
+                    <div className="flex justify-between text-xs">
+                      <span>{opt.label}</span>
+                      <span>{percent}%</span>
+                    </div>
+                    <div className="h-5 border border-black rounded-lg bg-gray-50 overflow-hidden">
+                      <div className="h-full bg-black" style={{ width: `${percent}%` }}></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
